@@ -18,10 +18,16 @@ scp -P 4242 level02@192.168.1.92:/home/user/level02/level02.pcap .
 - Ouvrir le fichier `level02.pcap`
 - Aller à la **ligne 43**
 
+![alt text](wireshark1.png)
+
 - Faire **clic droit > Follow > TCP stream**
 - On observe un mot de passe partiel : `ft_wandr...NDRel.L0L`
 
+![alt text]({3E0A5566-9CAC-4F8C-A871-A14D9ECB02CA}.png)
+
 🧪 Afficher les données en **tableau C** (View as: C Arrays) pour décoder les caractères non imprimables.
+
+![alt text]({188B45E4-033A-4663-99F9-1140E68D6C2B}.png)
 
 ---
 
