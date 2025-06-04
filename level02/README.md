@@ -17,6 +17,7 @@ scp -P 4242 level02@192.168.1.92:/home/user/level02/level02.pcap .
 
 - Ouvrir le fichier `level02.pcap`
 - Aller à la **ligne 43**
+
 - Faire **clic droit > Follow > TCP stream**
 - On observe un mot de passe partiel : `ft_wandr...NDRel.L0L`
 
